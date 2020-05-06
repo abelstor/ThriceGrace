@@ -5,25 +5,37 @@ import { Infopagina } from '../interfaces/info-pagina.interface';
 @Injectable({
   providedIn: 'root'
 })
+
 export class InfopaginaService {
 
   info: Infopagina = {};
   cargada = false;
 
-  constructor(private http: HttpClient) {
-    //console.log('Servicio de infopagina listo');
+  equipo: any[] = [];
 
+  constructor(private http: HttpClient) {
+
+    this.cargarInfo();
+    this.cargarEquipo();
+
+   }
+
+  private cargarInfo() {
     this.http.get('assets/data/data-pagina.json')
     .subscribe( (resp: Infopagina) => {
 
       this.cargada = true;
       this.info = resp;
 
-      console.log(resp);
+    });
+  }
+
+  private cargarEquipo(){
+    this.http.get('https://thricegrace-1ac63.firebaseio.com/equipo.json')
+    .subscribe((resp: any[]) => {
+
+      this.equipo = resp;
 
     });
-
-
-
-   }
+  }
 }

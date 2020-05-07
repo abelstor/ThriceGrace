@@ -31,11 +31,17 @@ export class InfopaginaService {
   }
 
   private cargarEquipo(){
+
+    // leer archivo json
+
     this.http.get('https://thricegrace-1ac63.firebaseio.com/equipo.json')
     .subscribe((resp: any[]) => {
 
       this.equipo = resp;
+      // console.log(resp);
 
     });
+      // this.equipo = resp
   }
 }
+

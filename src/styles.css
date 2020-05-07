@@ -1,4 +1,12 @@
+/*SVG ANIMATION*/
 
+svg path,
+svg rect{
+  fill: black;
+}
+
+
+/* animaciones*/
 
 
 .animated {

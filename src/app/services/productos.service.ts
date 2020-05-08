@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Producto } from '../interfaces/producto.interfaces';
+import { rejects } from 'assert';
 
 
 @Injectable({
@@ -10,25 +11,75 @@ import { Producto } from '../interfaces/producto.interfaces';
 export class ProductosService {
 
   cargando = true;
-  producto: Producto [] = [];
+  productos: Producto [] = [];
+  productosFiltrado: Producto [] = [];
 
   constructor( private http: HttpClient) {
+
     this.cargarProductos();
+
    }
 
 
   private cargarProductos(){
 
-    this.http.get('https://thricegrace-1ac63.firebaseio.com/productos_idx.json')
-        .subscribe (( resp: Producto [] ) => {
+    return new Promise( ( resolve, reject) => {
 
-          console.log(resp);
-          this.producto = resp;
-          setTimeout(() => {
-          this.cargando = false;
-          }, 1000);
+      this.http.get('https://thricegrace-1ac63.firebaseio.com/productos_idx.json')
+        .subscribe (( resp: Producto [] ) => {
+            this.productos = resp;
+            setTimeout(() => {
+            this.cargando = false;
+            resolve();
+            }, 1000);
+      });
+
+    });
+
+
+  }
+
+  getProducto(id: string) {
+
+    return this.http.get(`https://thricegrace-1ac63.firebaseio.com/productos/${id}.json`)
+
+  }
+
+  buscarProducto( termino: string ) {
+
+
+    if (this.productos.length === 0) {
+      // cargar productos
+      this.cargarProductos().then(() => {
+        // ejecutar despues de tener los productos
+        // aplicar el filtro
+
+        this.filtrarProductos(termino);
+      });
+
+    }else {
+      // aplicar el filtro
+      this.filtrarProductos(termino);
+    }
+  }
+
+  private filtrarProductos( termino: string) {
+
+    // console.log(this.productos);
+    this.productosFiltrado = [];
+
+    termino = termino.toLocaleLowerCase();
+
+    this.productos.forEach( prod => {
+
+      const tituloLower = prod.titulo.toLocaleLowerCase();
+
+      if (prod.categoria.indexOf (termino) >= 0 || tituloLower.indexOf(termino) >= 0 ) {
+        this.productosFiltrado.push (prod);
+      }
 
     });
 
   }
+
 }
